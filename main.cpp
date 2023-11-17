@@ -232,9 +232,9 @@ void opcontrol()
         catacontrol = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
 
 
-        leftBottom.move(1.5 * (drivePower + turnPower));
-        leftBack.move(1.5 * (drivePower + turnPower));
-        leftTop.move(1.5 * (drivePower + turnPower));
+        leftBottom.move((drivePower + turnPower));
+        leftBack.move((drivePower + turnPower));
+        leftTop.move((drivePower + turnPower));
         rightBottom.move(drivePower - turnPower);
         rightTop.move(drivePower - turnPower);
         rightBack.move(drivePower - turnPower);
