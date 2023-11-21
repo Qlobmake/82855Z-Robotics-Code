@@ -147,13 +147,16 @@ int drivePID(int desiredValue, bool enableDrivePID, bool resetDriveSensors){
 
 
 void autonomous() {
-    // resetDriveSensors = true;
+   // resetDriveSensors = true;
     // enableDrivePID = true;
     // desiredValue = -1000;  
     // double currentHeading = imu_sensor.get_rotation();  
    
     drivePID(1, true, true);  
+    Intake.move(97); //drops the intake from starting position
     pros::delay(100);
+
+    Intake.move(0);
     leftBottom.move(0);
     leftBack.move(0);
     leftTop.move(0);
@@ -180,21 +183,13 @@ void autonomous() {
     Intake.move(127); // outtakes triball near goal
     pros::delay(3500);
 
-    leftBottom.move(127); //moves slightly away from the goal
-    leftBack.move(127);
-    leftTop.move(127);
-    rightBottom.move(127);
-    rightBack.move(127);
-    rightTop.move(127);
-    pros::delay(225);   
-
-    leftBottom.move(-127); // rotates so that the ramming bar is facing the net
+    leftBottom.move(-127); //moves slightly away from the goal
     leftBack.move(-127);
     leftTop.move(-127);
-    rightBottom.move(127);
-    rightBack.move(127);
-    rightTop.move(127);
-    pros::delay(325);
+    rightBottom.move(-127);
+    rightBack.move(-127);
+    rightTop.move(-127);
+    pros::delay(225);   
 
     leftBottom.move(0); //sops moving
     leftBack.move(0);
@@ -204,13 +199,22 @@ void autonomous() {
     rightTop.move(0);
     pros::delay(300);
 
-    leftBottom.move(127); //smashes ball into goal
-    leftBack.move(127);
-    leftTop.move(127);
-    rightBottom.move(127);
-    rightBack.move(127);
-    rightTop.move(127);
-    pros::delay(750);
+    //leftBottom.move(-127); // rotates so that the ramming bar is facing the net
+    //leftBack.move(-127);
+    //leftTop.move(-127);
+    //rightBottom.move(127);
+    //rightBack.move(127);
+    //rightTop.move(127);
+    //pros::delay(325);
+
+    //leftBottom.move(0); //sops moving
+    //leftBack.move(0);
+    //leftTop.move(0);
+    //rightBottom.move(0);
+    //rightBack.move(0);
+    //rightTop.move(0);
+    //pros::delay(300);
+
 }
 
 
@@ -232,9 +236,9 @@ void opcontrol()
         catacontrol = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
 
 
-        leftBottom.move((drivePower + turnPower));
-        leftBack.move((drivePower + turnPower));
-        leftTop.move((drivePower + turnPower));
+        leftBottom.move(1.5 * (drivePower + turnPower));
+        leftBack.move(1.5 * (drivePower + turnPower));
+        leftTop.move(1.5 * (drivePower + turnPower));
         rightBottom.move(drivePower - turnPower);
         rightTop.move(drivePower - turnPower);
         rightBack.move(drivePower - turnPower);
