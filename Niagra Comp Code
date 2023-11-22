@@ -153,63 +153,157 @@ void autonomous() {
     // double currentHeading = imu_sensor.get_rotation();  
    
     drivePID(1, true, true);  
-    leftBottom.move(-127); //drives towards the net
-    leftBack.move(-127);
-    leftTop.move(-127);
-    rightBottom.move(-127);
-    rightBack.move(-127);
-    rightTop.move(-127);
-    pros::delay(300);
-    Intake.move(97); //drops the intake from starting position
-    leftBottom.move(0);
+    
+    Intake.move(127); //drops intake
+    pros::delay(150);
+    
+    Intake.move(0);
+    leftBottom.move(-115); //drives towards the middle
+    leftBack.move(-115);
+    leftTop.move(-115);
+    rightBottom.move(-115);
+    rightBack.move(-115);
+    rightTop.move(-115);
+    pros::delay(525);
+
+    leftBottom.move(0); //stops and outakes triball
     leftBack.move(0);
     leftTop.move(0);
     rightBottom.move(0);
     rightBack.move(0);
     rightTop.move(0); 
-    pros::delay(100);
+    pros::delay(150);
+
+    leftBottom.move(100); //turns 90 degrees to the right
+    leftBack.move(100);
+    leftTop.move(100);
+    rightBottom.move(-100);
+    rightBack.move(-100);
+    rightTop.move(-100);
+    pros::delay(215);
+
+    leftBottom.move(0); //stops and outakes triball
+    leftBack.move(0);
+    leftTop.move(0);
+    rightBottom.move(0);
+    rightBack.move(0);
+    rightTop.move(0); 
+    pros::delay(150);
+
+    Intake.move(120); //outtakes triball #1
+    pros::delay(500);
+
+    leftBottom.move(100); //moves backwards
+    leftBack.move(100);
+    leftTop.move(100);
+    rightBottom.move(100);
+    rightBack.move(100);
+    rightTop.move(100);
+    pros::delay(200);
+
+    leftBottom.move(-100); //turns 90 degrees to the left
+    leftBack.move(-100);
+    leftTop.move(-100);
+    rightBottom.move(100);
+    rightBack.move(100);
+    rightTop.move(100);
+    pros::delay(220);
+
     Intake.move(0);
-    leftBottom.move(-127); //drives towards the net
-    leftBack.move(-127);
-    leftTop.move(-127);
-    rightBottom.move(127);
-    rightBack.move(127);
-    rightTop.move(127);
-    pros::delay(325);
-    leftBottom.move(-127); //drives towards the net
-    leftBack.move(-127);
-    leftTop.move(-127);
-    rightBottom.move(-127);
-    rightBack.move(-127);
-    rightTop.move(-127);
-    
+    leftBottom.move(-100); //turns 90 degrees to the left
+    leftBack.move(-100);
+    leftTop.move(-100);
+    rightBottom.move(100);
+    rightBack.move(100);
+    rightTop.move(100);
+    pros::delay(220);
 
- 
-
-    leftBottom.move(-127); //drives towards the net
+    leftBottom.move(-127); //Move torward triball2
     leftBack.move(-127);
     leftTop.move(-127);
     rightBottom.move(-127);
     rightBack.move(-127);
     rightTop.move(-127);
-    pros::delay(550);
+    pros::delay(365);
 
+    Intake.move(-127);
+
+    leftBottom.move(0); //Stops
+    leftBack.move(0);
+    leftTop.move(0);
+    rightBottom.move(0);
+    rightBack.move(0);
+    rightTop.move(0);
+    pros::delay(400);
+
+    leftBottom.move(100); //moves backwards
+    leftBack.move(100);
+    leftTop.move(100);
+    rightBottom.move(100);
+    rightBack.move(100);
+    rightTop.move(100);
+    pros::delay(250);
+
+    leftBottom.move(100); //turns 90 degrees to the right
+    leftBack.move(100);
+    leftTop.move(100);
+    rightBottom.move(-100);
+    rightBack.move(-100);
+    rightTop.move(-100);
+    pros::delay(200);
+
+    leftBottom.move(0); //Stops
+    leftBack.move(0);
+    leftTop.move(0);
+    rightBottom.move(0);
+    rightBack.move(0);
+    rightTop.move(0);
+    pros::delay(200);
     
-    //leftBottom.move(-127); // rotates so that the ramming bar is facing the net
-    //leftBack.move(-127);
-    //leftTop.move(-127);
-    //rightBottom.move(127);
-    //rightBack.move(127);
-    //rightTop.move(127);
-    //pros::delay(325);
+    leftBottom.move(-90); //drives towards the middle
+    leftBack.move(-90);
+    leftTop.move(-90);
+    rightBottom.move(-90);
+    rightBack.move(-90);
+    rightTop.move(-90);
+    pros::delay(195);
 
-    //leftBottom.move(0); //sops moving
-    //leftBack.move(0);
-    //leftTop.move(0);
-    //rightBottom.move(0);
-    //rightBack.move(0);
-    //rightTop.move(0);
-    //pros::delay(300);
+    leftBottom.move(100); //turns 90 degrees to the right
+    leftBack.move(100);
+    leftTop.move(100);
+    rightBottom.move(-100);
+    rightBack.move(-100);
+    rightTop.move(-100);
+    pros::delay(215);
+
+    leftBottom.move(0); //stops and outakes triball
+    leftBack.move(0);
+    leftTop.move(0);
+    rightBottom.move(0);
+    rightBack.move(0);
+    rightTop.move(0); 
+    pros::delay(300);
+
+    Intake.move(120); //outtakes triball #2
+    pros::delay(375);
+
+    leftBottom.move(100); //moves backwards
+    leftBack.move(100);
+    leftTop.move(100);
+    rightBottom.move(100);
+    rightBack.move(100);
+    rightTop.move(100);
+    pros::delay(250);
+
+    leftBottom.move(0); //stops
+    leftBack.move(0);
+    leftTop.move(0);
+    rightBottom.move(0);
+    rightBack.move(0);
+    rightTop.move(0);
+    pros::delay(250);
+
+    LW.set_value(1);
 
 }
 
