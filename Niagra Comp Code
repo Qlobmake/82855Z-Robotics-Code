@@ -153,17 +153,38 @@ void autonomous() {
     // double currentHeading = imu_sensor.get_rotation();  
    
     drivePID(1, true, true);  
+    leftBottom.move(-127); //drives towards the net
+    leftBack.move(-127);
+    leftTop.move(-127);
+    rightBottom.move(-127);
+    rightBack.move(-127);
+    rightTop.move(-127);
+    pros::delay(300);
     Intake.move(97); //drops the intake from starting position
-    pros::delay(100);
-
-    Intake.move(0);
     leftBottom.move(0);
     leftBack.move(0);
     leftTop.move(0);
     rightBottom.move(0);
     rightBack.move(0);
-    rightTop.move(0);
+    rightTop.move(0); 
     pros::delay(100);
+    Intake.move(0);
+    leftBottom.move(-127); //drives towards the net
+    leftBack.move(-127);
+    leftTop.move(-127);
+    rightBottom.move(127);
+    rightBack.move(127);
+    rightTop.move(127);
+    pros::delay(325);
+    leftBottom.move(-127); //drives towards the net
+    leftBack.move(-127);
+    leftTop.move(-127);
+    rightBottom.move(-127);
+    rightBack.move(-127);
+    rightTop.move(-127);
+    
+
+ 
 
     leftBottom.move(-127); //drives towards the net
     leftBack.move(-127);
@@ -173,32 +194,7 @@ void autonomous() {
     rightTop.move(-127);
     pros::delay(550);
 
-    leftBottom.move(0); //stops at the net
-    leftBack.move(0);
-    leftTop.move(0);
-    rightBottom.move(0);
-    rightBack.move(0);
-    rightTop.move(0);
-
-    Intake.move(127); // outtakes triball near goal
-    pros::delay(3500);
-
-    leftBottom.move(-127); //moves slightly away from the goal
-    leftBack.move(-127);
-    leftTop.move(-127);
-    rightBottom.move(-127);
-    rightBack.move(-127);
-    rightTop.move(-127);
-    pros::delay(225);   
-
-    leftBottom.move(0); //sops moving
-    leftBack.move(0);
-    leftTop.move(0);
-    rightBottom.move(0);
-    rightBack.move(0);
-    rightTop.move(0);
-    pros::delay(300);
-
+    
     //leftBottom.move(-127); // rotates so that the ramming bar is facing the net
     //leftBack.move(-127);
     //leftTop.move(-127);
