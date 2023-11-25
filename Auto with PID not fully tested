@@ -54,8 +54,8 @@ double KP = 7.5;
 double KD = 1.4;
 
 // turn PID variables
-double turnKP = 1.35;
-double turnKD = 4.0;
+double turnKP = 1.0;
+double turnKD = 0.5;
 
 // Error in position for drive straight PID
 double error, prevError, errorRate, velocity;
@@ -79,7 +79,7 @@ void drivePID(double distance) {
     prevError = error;
 
     // Continue the loop while drive PID is enabled
-    while (true) {
+    while (std::abs(error) > 0.5) {
         // Calculate average position and its derivative for drive straight PID
         error = distance - getPosition();
         errorRate = error - prevError;
@@ -106,7 +106,7 @@ void drivePID(double distance) {
     rightDrive = 0;
 }
 
-void turnPID(double degrees, double scaling=1.0, double timeout = -1) {
+void turnPID(double degrees, double scaling=1.0) { //, double timeout = -1) {
 	imu_sensor.tare_heading();
 	error = degrees;
 	prevError = error;
@@ -136,11 +136,11 @@ void turnPID(double degrees, double scaling=1.0, double timeout = -1) {
 			rightDrive = velocity*scaling;
 		}
         
-        if (timeout != -1) {
-            if (pros::millis() > (startTime + timeout)) {
-                break;
-            }
-        }
+        //if (timeout != -1) {
+          //if (pros::millis() > (startTime + timeout)) {
+            //break;
+            //}
+        //}
 
 		prevError = error;
 		pros::delay(20);
@@ -156,13 +156,23 @@ void initialize() {
 }
 
 void autonomous() {
+    Intake.move(127);
+    pros::delay(150);
+    Intake.move(0);
 
+    turnPID(38, 1);
+    drivePID(-33);
+    turnPID(-38, 1);
 
-    // drivePID(24);
-    turnPID(90, 1, 700);
+    Intake.move(127);
+    pros::delay(500);
+    Intake.move(0);
+    
+    drivePID(-4);
+    //turnPID(180, 0.7);
 
-    turnPID(180,1, 700);
-    // pros::delay(1000);
+    //turnPID(-90,1);
+    //drivePID(14);
     // turnPID_left(90);
     // turnPID(-90);
     // pros::delay(1000);
