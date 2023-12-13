@@ -193,12 +193,21 @@ void autonomous()
      Intake.move(127);
      pros::delay(300);
      Intake.move(0);
-     turnPID(-160, 0.7);
+     turnPID(-165, 0.7);
      leftDrive.move(127);
      rightDrive.move(127);
      pros::delay(500);
      leftDrive.move(0);
      rightDrive.move(0);
+     pros::delay(100);
+     drivePID(-7);
+     leftDrive.move(127);
+     rightDrive.move(127);
+     pros::delay(100);
+     leftDrive.move(0);
+     rightDrive.move(0);
+
+
 
    
    
