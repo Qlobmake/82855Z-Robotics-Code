@@ -179,6 +179,27 @@ void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
 
 void autonomous()
 {
+     drivePID(-8);
+     Intake.move(-127);
+     pros::delay(250);
+     drivePID(26);
+     turnPID(-35, 1);
+     LW.set_value(true);
+     drivePID(26);
+     pros::delay(60);
+     LW.set_value(false);
+     pros::delay(200);
+     turnPID(120, 0.8);
+     Intake.move(127);
+     pros::delay(300);
+     Intake.move(0);
+     turnPID(-160, 0.7);
+     leftDrive.move(127);
+     rightDrive.move(127);
+     pros::delay(500);
+     leftDrive.move(0);
+     rightDrive.move(0);
+
    
    
    /* drivePID(-5);
