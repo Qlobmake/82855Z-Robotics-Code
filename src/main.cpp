@@ -35,6 +35,8 @@ pros::ADIDigitalOut LW('H', false);
 pros::Imu imu_sensor(17);
 
 
+// Re code PID using IMU and inersha sensor avg. 
+// Gear Ratio for base bot also changed 
 
 
 bool variableA = true;
@@ -74,7 +76,7 @@ double error, prevError, errorRate, velocity;
 
 // Flag to indicate whether drive sensors should be reset || Maybe resets too quickly
 bool resetDriveSensors = true;
-
+bool killswitch = false;
 
 double getPosition() {
   return 3.25*M_PI*leftBottom.get_position()*(3.0/5.0);
@@ -114,9 +116,6 @@ void drivePID(double distance) {
         rightDrive.move(velocity);
 
 
-        pros::lcd::print(1, "error: %f", error);
-     pros::lcd::print(2, "error rate: %f", errorRate);
-     pros::lcd::print(3, "velocity: %f", velocity);
 
 
         prevError = error;
@@ -179,50 +178,144 @@ void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
 
 void autonomous()
 {
-     drivePID(-8);
-     Intake.move(-127);
-     pros::delay(250);
-     drivePID(26);
-     turnPID(-35, 1);
-     LW.set_value(true);
-     drivePID(26);
-     pros::delay(60);
-     LW.set_value(false);
-     pros::delay(200);
-     turnPID(120, 0.8);
-     Intake.move(127);
-     pros::delay(300);
-     Intake.move(0);
-     turnPID(-165, 0.7);
-     leftDrive.move(127);
-     rightDrive.move(127);
-     pros::delay(500);
-     leftDrive.move(0);
-     rightDrive.move(0);
-     pros::delay(100);
-     drivePID(-7);
-     leftDrive.move(127);
-     rightDrive.move(127);
-     pros::delay(100);
-     leftDrive.move(0);
-     rightDrive.move(0);
-
-
-
+    catapultMotor.move(127);
+    pros::delay(5000);
    
-   
-   /* drivePID(-5);
-    turnPID(150, 0.8);
-    drivePID(6);
-    Intake.move(-127);
-    pros::delay(150);
-    drivePID(-5);
-    turnPID(100, 1);
-    drivePID(37); */
+    while (abs(REST_POSITION - Rotationsensor.get_position()) > 700)
+    {
+    catapultMotor.move(127);
+    //pros::delay(200);
+    }
   
+    catapultMotor.move(0);  
+    turnPID(34, 1.3);
+    drivePID(78);
+   
+    turnPID(-28, 1.3);
+    drivePID(12);
+    turnPID(-40, 1.3);
+   
+    RW.set_value(true);
+  
+    leftDrive.move(127);
+    rightDrive.move(127);
+    pros::delay(600);
+  
+    leftDrive.move(0);
+    rightDrive.move(0);
+  
+    RW.set_value(false);
+    pros::delay(600);
+ 
+    drivePID(-10);
+    turnPID(-60, 1);
+    drivePID(40);
+    turnPID(77, 1); 
+    drivePID(24);
+    turnPID(90,1);
+  
+    LW.set_value(true);
+    RW.set_value(true);
+   
+    leftDrive.move(127);
+    rightDrive.move(127);
+   
+    pros::delay(600);
+    
+    leftDrive.move(0);
+    rightDrive.move(0);
+
+
 }
 
+void displayStuff() { //Displays things
 
+    bool leftBottomConnected = true;
+    int prevLeftBottomPosition = leftBottom.get_position();
+    int currentLeftBottomPosition = leftBottom.get_position();
+
+    if (abs(currentLeftBottomPosition - prevLeftBottomPosition) < 1) {
+        leftBottomConnected = true;
+        pros::lcd::print(1, "Left Bottom Connected: Yes");
+    } else {
+        leftBottomConnected = false;
+        pros::lcd::print(1, "Left Bottom Connected: No");
+    }
+    prevLeftBottomPosition = currentLeftBottomPosition;
+ ///////////////////////////////////////////////////////////////////////////////////////////////
+     bool leftTopConnected = true;
+    int prevLeftTopPosition = leftTop.get_position();
+    int currentLeftTopPosition = leftTop.get_position();
+
+    if (abs(currentLeftTopPosition - prevLeftTopPosition) < 1) {
+        leftBottomConnected = true;
+        pros::lcd::print(2, "Left Top Connected: Yes");
+    } else {
+        leftBottomConnected = false;
+        pros::lcd::print(2, "Left Top Connected: No");
+    }
+    prevLeftTopPosition = currentLeftTopPosition;
+////////////////////////////////////////////////////////////////////////////////////////
+    
+    bool leftBackConnected = true;
+    int prevLeftBackPosition = leftBack.get_position();
+    int currentLeftBackPosition = leftBack.get_position();
+
+    if (abs(currentLeftBackPosition - prevLeftBackPosition) < 1) {
+        leftBackConnected = true;
+        pros::lcd::print(3, "Left Back Connected: Yes");
+    } else {
+        leftBackConnected = false;
+        pros::lcd::print(3, "Left Back Connected: No");
+    }
+    prevLeftBackPosition = currentLeftBackPosition;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool rightBottomConnected = true;
+    int prevRightBottomPosition = rightBottom.get_position();
+    int currentRightBottomPosition = rightBottom.get_position();
+
+    if (abs(currentRightBottomPosition - prevRightBottomPosition) < 1) {
+        rightBottomConnected = true;
+        pros::lcd::print(4, "Right Bottom Connected: Yes");
+    } else {
+        rightBottomConnected = false;
+        pros::lcd::print(4, "Right Bottom Connected: No");
+    }
+    prevRightBottomPosition = currentRightBottomPosition;
+    /////////////////////////////////////////////////////////////////////////////////////////
+    bool rightBackConnected = true;
+    int prevRightBackPosition = rightBack.get_position();
+    int currentRightBackPosition = rightBack.get_position();
+
+    if (abs(currentRightBackPosition - prevRightBackPosition) < 1) {
+        rightBackConnected = true;
+        pros::lcd::print(5, "Right Back Connected: Yes");
+    } else {
+        rightBackConnected = false;
+        pros::lcd::print(5, "Right Back Connected: No");
+    }
+    prevRightBackPosition = currentRightBackPosition;
+/////////////////////////////////////////////////////////////////////////////////
+bool rightTopConnected = true;
+    int prevRightTopPosition = rightTop.get_position();
+    int currentRightTopPosition = rightTop.get_position();
+
+    if (abs(currentRightTopPosition - prevRightTopPosition) < 1) {
+        rightTopConnected = true;
+        pros::lcd::print(6, "Right Top Connected: Yes");
+    } else {
+        rightTopConnected = false;
+        pros::lcd::print(6, "Right Top Connected: No");
+    }
+    prevRightTopPosition = currentRightTopPosition;
+////////////////////////////////////////////////////////////////////////
+    pros::lcd::print(7, "Left Bottom Temp: %d", leftBottom.get_temperature());
+    pros::lcd::print(8, "Left Back Temp: %d", leftBack.get_temperature());
+    pros::lcd::print(9, "Left Top Temp: %d", leftTop.get_temperature());
+    pros::lcd::print(10, "Right Bottom Temp: %d", rightBottom.get_temperature());
+    pros::lcd::print(11, "Right Back Temp: %d", rightBack.get_temperature());
+    pros::lcd::print(12, "Right Top Temp: %d", rightTop.get_temperature());
+}
 
 
 void opcontrol()
@@ -239,7 +332,12 @@ void opcontrol()
 
     while (true)
     {
-        pros::screen::print(TEXT_MEDIUM, 1, "ANGLE: %f", Rotationsensor.get_position());
+
+       displayStuff();
+      
+       
+     
+       
         drivePower = MasterController.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         turnPower = MasterController.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         leftstate = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R2);
