@@ -240,7 +240,7 @@ void displayStuff() { //Displays things
     pros::lcd::print(3, "Left Top Connected: %s", leftBottomConnected ? "Yes" : "No");
 
     bool rightTopConnected = rightTop.get_position() != 0;
-    pros::lcd::print(4, "right Top Connected: %s", leftBottomConnected ? "Yes" : "No");
+    pros::lcd::print(4, "Right Top Connected: %s", leftBottomConnected ? "Yes" : "No");
     
     bool rightBottomConnected = rightBottom.get_position() != 0;
     pros::lcd::print(5, "Right Bottom Connected: %s", leftBottomConnected ? "Yes" : "No");
