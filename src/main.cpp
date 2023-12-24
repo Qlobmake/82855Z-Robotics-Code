@@ -230,85 +230,24 @@ void autonomous()
 
 void displayStuff() { //Displays things
 
-    bool leftBottomConnected = true;
-    int prevLeftBottomPosition = leftBottom.get_position();
-    int currentLeftBottomPosition = leftBottom.get_position();
+    bool leftBottomConnected = leftBottom.get_position() != 0;
+    pros::lcd::print(1, "Left Bottom Connected: %s", leftBottomConnected ? "Yes" : "No");
 
-    if (abs(currentLeftBottomPosition - prevLeftBottomPosition) < 1) {
-        leftBottomConnected = true;
-        pros::lcd::print(1, "Left Bottom Connected: Yes");
-    } else {
-        leftBottomConnected = false;
-        pros::lcd::print(1, "Left Bottom Connected: No");
-    }
-    prevLeftBottomPosition = currentLeftBottomPosition;
- ///////////////////////////////////////////////////////////////////////////////////////////////
-     bool leftTopConnected = true;
-    int prevLeftTopPosition = leftTop.get_position();
-    int currentLeftTopPosition = leftTop.get_position();
+    bool leftBackConnected = leftBack.get_position() != 0;
+    pros::lcd::print(2, "Left Back Connected: %s", leftBottomConnected ? "Yes" : "No");
 
-    if (abs(currentLeftTopPosition - prevLeftTopPosition) < 1) {
-        leftBottomConnected = true;
-        pros::lcd::print(2, "Left Top Connected: Yes");
-    } else {
-        leftBottomConnected = false;
-        pros::lcd::print(2, "Left Top Connected: No");
-    }
-    prevLeftTopPosition = currentLeftTopPosition;
-////////////////////////////////////////////////////////////////////////////////////////
+    bool leftTopConnected = leftTop.get_position() != 0;
+    pros::lcd::print(3, "Left Top Connected: %s", leftBottomConnected ? "Yes" : "No");
+
+    bool rightTopConnected = rightTop.get_position() != 0;
+    pros::lcd::print(4, "right Top Connected: %s", leftBottomConnected ? "Yes" : "No");
     
-    bool leftBackConnected = true;
-    int prevLeftBackPosition = leftBack.get_position();
-    int currentLeftBackPosition = leftBack.get_position();
-
-    if (abs(currentLeftBackPosition - prevLeftBackPosition) < 1) {
-        leftBackConnected = true;
-        pros::lcd::print(3, "Left Back Connected: Yes");
-    } else {
-        leftBackConnected = false;
-        pros::lcd::print(3, "Left Back Connected: No");
-    }
-    prevLeftBackPosition = currentLeftBackPosition;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-    bool rightBottomConnected = true;
-    int prevRightBottomPosition = rightBottom.get_position();
-    int currentRightBottomPosition = rightBottom.get_position();
-
-    if (abs(currentRightBottomPosition - prevRightBottomPosition) < 1) {
-        rightBottomConnected = true;
-        pros::lcd::print(4, "Right Bottom Connected: Yes");
-    } else {
-        rightBottomConnected = false;
-        pros::lcd::print(4, "Right Bottom Connected: No");
-    }
-    prevRightBottomPosition = currentRightBottomPosition;
-    /////////////////////////////////////////////////////////////////////////////////////////
-    bool rightBackConnected = true;
-    int prevRightBackPosition = rightBack.get_position();
-    int currentRightBackPosition = rightBack.get_position();
-
-    if (abs(currentRightBackPosition - prevRightBackPosition) < 1) {
-        rightBackConnected = true;
-        pros::lcd::print(5, "Right Back Connected: Yes");
-    } else {
-        rightBackConnected = false;
-        pros::lcd::print(5, "Right Back Connected: No");
-    }
-    prevRightBackPosition = currentRightBackPosition;
-/////////////////////////////////////////////////////////////////////////////////
-bool rightTopConnected = true;
-    int prevRightTopPosition = rightTop.get_position();
-    int currentRightTopPosition = rightTop.get_position();
-
-    if (abs(currentRightTopPosition - prevRightTopPosition) < 1) {
-        rightTopConnected = true;
-        pros::lcd::print(6, "Right Top Connected: Yes");
-    } else {
-        rightTopConnected = false;
-        pros::lcd::print(6, "Right Top Connected: No");
-    }
-    prevRightTopPosition = currentRightTopPosition;
-////////////////////////////////////////////////////////////////////////
+    bool rightBottomConnected = rightBottom.get_position() != 0;
+    pros::lcd::print(5, "Right Bottom Connected: %s", leftBottomConnected ? "Yes" : "No");
+    
+    bool rightBackConnected = rightBack.get_position() != 0;
+    pros::lcd::print(6, "Right Back Connected: %s", leftBottomConnected ? "Yes" : "No");
+    
     pros::lcd::print(7, "Left Bottom Temp: %d", leftBottom.get_temperature());
     pros::lcd::print(8, "Left Back Temp: %d", leftBack.get_temperature());
     pros::lcd::print(9, "Left Top Temp: %d", leftTop.get_temperature());
@@ -323,11 +262,6 @@ void opcontrol()
     int drivePower;
     int turnPower;
     pros::delay(5);
-
-
-    std::cout << "hello world";
-
-
 
 
     while (true)
