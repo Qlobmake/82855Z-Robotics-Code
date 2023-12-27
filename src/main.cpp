@@ -33,8 +33,7 @@ pros::Controller MasterController(pros::E_CONTROLLER_MASTER);
 pros::ADIDigitalOut RW('A', false);
 pros::ADIDigitalOut LW('H', false);
 pros::Imu imu_sensor(17);
-
-
+pros::Rotation PIDRotationSensor(50); 
 // Re code PID using IMU and inersha sensor avg. 
 // Gear Ratio for base bot also changed 
 
@@ -78,99 +77,88 @@ double error, prevError, errorRate, velocity;
 bool resetDriveSensors = true;
 bool killswitch = false;
 
-double getPosition() {
-  return 3.25*M_PI*leftBottom.get_position()*(3.0/5.0);
+double calculatePosition() {
+    double imuHeading = imu_sensor.get_rotation(); // Use IMU for heading
+    double rotationPosition = Rotationsensor.get_position(); // Use rotational sensor for position
+    return (imuHeading + rotationPosition) / 2.0;
 }
 
 
 
 
 // Function to control the drive straight and turning using PID
-void drivePID(double distance) {
+void drivePID(double distance, int timeOut = 10000) {
     // reset motors
     leftDrive.tare_position();
     rightDrive.tare_position();
 
-
     error = distance;
     prevError = error;
-
+    double startTime = pros::millis();
 
     // Continue the loop while drive PID is enabled
-    while (std::abs(error) > 0.5) {
+    while (std::abs(error) > 0.5 && ((pros::millis() - startTime) < timeOut)) {
         // Calculate average position and its derivative for drive straight PID
-        error = distance - getPosition();
+        error = distance - calculatePosition();
         errorRate = error - prevError;
 
-
-
-
         velocity = KP * error + KD * errorRate;
-
 
         leftDrive = velocity;
         rightDrive = velocity;
 
-
         leftDrive.move(velocity);
         rightDrive.move(velocity);
 
-
-
-
         prevError = error;
-
 
         pros::delay(20);
     }
-
 
     leftDrive = 0;
     rightDrive = 0;
 }
 
-
-void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
+void turnPID(double degrees, double scaling = 1.0, int timeOut = 10000) {
+    // reset heading and rotational sensor position
     imu_sensor.tare_heading();
+    PIDRotationSensor.set_position(0);
+
     error = degrees;
     prevError = error;
 
-
     double startTime = pros::millis();
 
-
-    double averageHeading, heading1;
-    while (std::abs(error) > 8 || leftBack.get_actual_velocity() > 15 || rightBack.get_actual_velocity() > 15) {
-        // distance subtracted by the average of the four ground motors
-        heading1 = imu_sensor.get_heading();
-        if (heading1 > 180) heading1 -= 360;
-
-
-        averageHeading = (heading1);
-        error = std::abs(degrees - averageHeading);
+    double averagePosition, position1;
+    while (std::abs(error) > 8 || leftBack.get_actual_velocity() > 15 || rightBack.get_actual_velocity() > 15 && ((pros::millis() - startTime) < timeOut)) {
+        // calculate position using IMU and rotational sensor
+        position1 = calculatePosition();
+        
+        // update error based on the difference between desired angle and position
+        averagePosition = (position1);
+        error = std::abs(degrees - averagePosition);
         errorRate = error - prevError;
-       
-        // using angular velocity instead of linear velocity
+
+        // calculate turn velocity using PID control
         velocity = turnKP * error + turnKD * errorRate;
 
-
-        // if degrees is positive, turn right
+        // set motor velocities based on the sign of the degrees
         if (degrees > 0) {
-            leftDrive = velocity*scaling;
-            rightDrive = -velocity*scaling;
-        // if degrees is negative, turn right
+            leftDrive = velocity * scaling;
+            rightDrive = -velocity * scaling;
         } else {
-            leftDrive = -velocity*scaling;
-            rightDrive = velocity*scaling;
+            leftDrive = -velocity * scaling;
+            rightDrive = velocity * scaling;
         }
-            //if (timeout != -1) {
-            //if (pros::millis() > (startTime + timeout)) {
-                //break;
-                //}
-            //}
+
+        // update previous error for the next iteration
         prevError = error;
+
+        // introduce a delay for the loop
         pros::delay(20);
     }
+
+    // stop the motors after the turn is complete
     leftDrive = 0;
     rightDrive = 0;
 }
@@ -178,54 +166,6 @@ void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
 
 void autonomous()
 {
-    catapultMotor.move(127);
-    pros::delay(5000);
-   
-    while (abs(REST_POSITION - Rotationsensor.get_position()) > 700)
-    {
-    catapultMotor.move(127);
-    //pros::delay(200);
-    }
-  
-    catapultMotor.move(0);  
-    turnPID(34, 1.3);
-    drivePID(78);
-   
-    turnPID(-28, 1.3);
-    drivePID(12);
-    turnPID(-40, 1.3);
-   
-    RW.set_value(true);
-  
-    leftDrive.move(127);
-    rightDrive.move(127);
-    pros::delay(600);
-  
-    leftDrive.move(0);
-    rightDrive.move(0);
-  
-    RW.set_value(false);
-    pros::delay(600);
- 
-    drivePID(-10);
-    turnPID(-60, 1);
-    drivePID(40);
-    turnPID(77, 1); 
-    drivePID(24);
-    turnPID(90,1);
-  
-    LW.set_value(true);
-    RW.set_value(true);
-   
-    leftDrive.move(127);
-    rightDrive.move(127);
-   
-    pros::delay(600);
-    
-    leftDrive.move(0);
-    rightDrive.move(0);
-
-
 }
 
 void displayStuff() { //Displays things
