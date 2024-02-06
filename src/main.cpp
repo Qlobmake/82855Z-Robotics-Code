@@ -64,19 +64,19 @@ void displayStuff() { //Displays things
     pros::lcd::print(1, "Left Bottom Connected: %s", leftBottomConnected ? "Yes" : "No");
 
     bool leftBackConnected = leftBack.get_position() != 0;
-    pros::lcd::print(2, "Left Back Connected: %s", leftBottomConnected ? "Yes" : "No");
+    pros::lcd::print(2, "Left Back Connected: %s", leftBackConnected ? "Yes" : "No");
 
     bool leftTopConnected = leftTop.get_position() != 0;
-    pros::lcd::print(3, "Left Top Connected: %s", leftBottomConnected ? "Yes" : "No");
+    pros::lcd::print(3, "Left Top Connected: %s", leftTopConnected ? "Yes" : "No");
 
     bool rightTopConnected = rightTop.get_position() != 0;
-    pros::lcd::print(4, "Right Top Connected: %s", leftBottomConnected ? "Yes" : "No");
+    pros::lcd::print(4, "Right Top Connected: %s", rightTopConnected ? "Yes" : "No");
     
     bool rightBottomConnected = rightBottom.get_position() != 0;
-    pros::lcd::print(5, "Right Bottom Connected: %s", leftBottomConnected ? "Yes" : "No");
+    pros::lcd::print(5, "Right Bottom Connected: %s", rightBottomConnected ? "Yes" : "No");
     
     bool rightBackConnected = rightBack.get_position() != 0;
-    pros::lcd::print(6, "Right Back Connected: %s", leftBottomConnected ? "Yes" : "No");
+    pros::lcd::print(6, "Right Back Connected: %s", rightTopConnected ? "Yes" : "No");
     
     pros::lcd::print(7, "Left Bottom Temp: %d", leftBottom.get_temperature());
     pros::lcd::print(8, "Left Back Temp: %d", leftBack.get_temperature());
@@ -227,7 +227,7 @@ void turnPID(double degrees, double scaling = 1.0, int timeLimit = 6000) { //, d
 
 void autonomous()
 {
-displayStuff();
+/*displayStuff();
 
  leftDrive.move(127);
  rightDrive.move(127);
@@ -341,7 +341,64 @@ rightDrive.move(127);
 pros::delay(300);
 
 leftDrive.move(0);
-rightDrive.move(0);
+rightDrive.move(0);*/
+
+
+///////////////////////////////////////////////////Auton 2 | close side /////////////////////////////////////////////////////////////
+/*drivePID(27);
+turnPID(50, 1);
+LW.set_value(true);
+RW.set_value(true);
+drivePID(10);
+turnPID(40, 1);
+LW.set_value(false);
+RW.set_value(false);
+drivePID(-20);
+Intake.move(-127);
+pros::delay(500);
+Intake.move(0);
+drivePID(10);
+turnPID(-60,1); 
+drivePID(12);
+turnPID(-10, 1);
+drivePID(20); //Drive the corner triball and the one under net out on other side. May need to add another turnPID + adjust values 
+drivePID(-5);
+turnPID(-30, 1);
+
+
+*/
+//////////////////////////////////////////////////Auton 3 far side)
+  drivePID(-8);
+  Intake.move(-127);
+  pros::delay(150);
+  drivePID(22);
+  turnPID(-35, 1);
+  LW.set_value(true);
+  drivePID(24);
+  pros::delay(50);
+  LW.set_value(false);
+  turnPID(-30, 1);
+  drivePID(5);
+  turnPID(20, 1);
+  drivePID(5);
+  drivePID(-5);
+  turnPID(150, 0.8);
+  drivePID(6);
+  Intake.move(-127);
+  pros::delay(150);
+  drivePID(-5);
+  drivePID(-8);
+  turnPID(100, 1);
+  drivePID(37);
+  turnPID(90, 1);
+  LW.set_value(true);
+  RW.set_value(true);  
+  drivePID(11);
+  turnPID(90, 1);
+  drivePID(26);
+  drivePID(-27);
+  turnPID(-90, 1);
+  drivePID(-30);
 
 
 }
