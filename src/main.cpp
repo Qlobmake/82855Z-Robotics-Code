@@ -48,6 +48,8 @@ bool catacontrol;
 bool prevPressed = false;
 const int REST_POSITION = 25700;
 bool spam = false;
+bool push = false;
+bool pull = false; 
 
 // PID constants
 double KP = 7.5;
@@ -161,7 +163,7 @@ void autonomous()
  
  
 
- leftDrive.move(-127);
+/* leftDrive.move(-127);
  rightDrive.move(-127);
 
     
@@ -256,10 +258,10 @@ pros::delay(300);
 
 leftDrive.move(0);
 rightDrive.move(0);
-
+*/
 
 ///////////////////////////////////////////////////Auton 2 | close side ///////////////////////////////////////////////////////////// 
-/*
+
 drivePID(27);
 turnPID(50, 1);
 LW.set_value(true);
@@ -283,7 +285,7 @@ turnPID(-30, 1);
 
 
 //////////////////////////////////////////////////Auton 3 far side)
-  drivePID(-8);
+  /*drivePID(-8);
   Intake.move(-127);
   pros::delay(150);
   drivePID(22);
@@ -333,6 +335,8 @@ void opcontrol()
         rightstate = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L2);
         catacurrent = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L1);
         catacontrol = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
+        // blockerState = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_UP);
+        // blockerState = MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP);
         leftBottom.move(1 * (drivePower + turnPower));
         leftBack.move(1 * (drivePower + turnPower));
         leftTop.move(1 * (drivePower + turnPower));
@@ -340,31 +344,61 @@ void opcontrol()
         rightTop.move(drivePower - turnPower);
         rightBack.move(drivePower - turnPower);
 
-       /* if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_A)) { //blocker up
-            // Blocker up
+
+        // if (blockerState == true && blockerUpPressedPrev == false)
+        // {
+        //     blockerOpen = !blockerOpen;
+        //     blockerUp.set_value(blockerOpen);
+        // }
+        // blockerUpPressedPrev = blockerState;
+        
+        if (MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+            push = !push;
+        }
+
+        if (push == true) {
             blockerUp.set_value(true);
-            blockerDown.set_value(false);
-        } else if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_B)) { //blocker down
-            // Blocker down
+        }
+
+        if (push == false){
             blockerUp.set_value(false);
-            blockerDown.set_value(false); 
-        } else if (pros::E_CONTROLLER_DIGITAL_A) { //hang
-            blockerUp.set_value(false);
+        }
+
+ 
+        if (MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+            pull = !pull;
+        }
+
+        if (pull == true) {
             blockerDown.set_value(true);
-        } else {
-            // No blocker command, keep both solenoids off
             blockerUp.set_value(false);
+        }
+
+        if (pull == false) {
             blockerDown.set_value(false);
-        } */
+        }
 
+        
 
+      
+      /*  if(downBlockerState == true && downBlockerUpPressedPrev == false && blockerState == false)
+        {
+            downBlockerOpen = !downBlockerOpen;
+            blockerUp.set_value(downBlockerOpen);
+            blockerDown.set_value(false); 
+            
+        }
+        downBlockerUpPressedPrev = downBlockerState; */
+       
         // wing L
         if (leftstate == true && leftprevious == false)
         {
             wingsOpenLeft = !wingsOpenLeft;
-            LW.set_value(wingsOpenLeft);
+             LW.set_value(wingsOpenLeft);
         }
         leftprevious = leftstate;
+
+    
 
 
 
