@@ -3,6 +3,7 @@
 #include "pros/llemu.hpp"
 #include "pros/misc.h"
 #include "pros/motors.hpp"
+#include "pros/rotation.h"
 #include "pros/rotation.hpp"
 #include "pros/rtos.hpp"
 #include <cmath>
@@ -15,21 +16,15 @@ pros::Motor leftTop(2, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_ROTA
 pros::Motor rightBottom(19, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 pros::Motor rightBack(17, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 pros::Motor rightTop(10, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-
-
 pros::Motor_Group leftDrive({leftBottom, leftBack, leftTop});
 pros::Motor_Group rightDrive({rightBottom, rightBack, rightTop});
-
-
 pros::Motor Intake(8);
-pros::Rotation Rotationsensor(14);
-pros::Motor catapultMotor(18, pros::E_MOTOR_GEARSET_18, true,
-                        pros::E_MOTOR_ENCODER_DEGREES);
+pros::Rotation Rotationsensor(14, true);
+pros::Motor catapultMotor(18, true);
 pros::Controller MasterController(pros::E_CONTROLLER_MASTER);
 pros::ADIDigitalOut RW('C', false);
 pros::ADIDigitalOut LW('A', false);
 pros::Imu imu_sensor(11);
-//pros::Rotation PIDRotationSensor(50); 
 pros::ADIDigitalOut blockerUp('B', false);
 pros::ADIDigitalOut blockerDown('D', false);
 
@@ -41,15 +36,12 @@ bool leftprevious = true;
 bool rightstate = true;
 bool rightcurrent = true;
 bool rightprevious = true;
-bool cataOn = false;
-bool cataprevious = true;
-bool catacurrent = true;
-bool catacontrol;
+bool cataState = false;
 bool prevPressed = false;
-const int REST_POSITION = 25700;
 bool spam = false;
 bool push = false;
-bool pull = false; 
+bool pull = false;
+bool intakeToggle = false;
 
 // PID constants
 double KP = 7.5;
@@ -62,58 +54,45 @@ double turnKD = 0.5;
 // Error in position for drive straight PID
 double error, prevError, errorRate, velocity;
 
-
-double getPosition() 
+double getPosition()
 {
   return 2.75*M_PI*leftBottom.get_position()*(36.0/48.0);
 }
-
 
 void drivePID(double distance) {
     // reset motors
     leftDrive.tare_position();
     rightDrive.tare_position();
 
-
     error = distance;
     prevError = error;
-  
-
+ 
     // Continue the loop while drive PID is enabled
-    while (std::abs(error) > 0.5) {
+    while (std::abs(error) > 0.6) {
         // Calculate average position and its derivative for drive straight PID
         error = distance - getPosition();
         errorRate = error - prevError;
 
-
         velocity = KP * error + KD * errorRate;
-
 
         leftDrive = velocity;
         rightDrive = velocity;
 
-
         leftDrive.move(velocity);
         rightDrive.move(velocity);
-
 
         pros::lcd::print(1, "error: %f", error);
         pros::lcd::print(2, "error rate: %f", errorRate);
         pros::lcd::print(3, "velocity: %f", velocity);
 
-
         prevError = error;
-
-
 
         pros::delay(20);
     }
 
-
     leftDrive = 0;
     rightDrive = 0;
 }
-
 
 void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
     imu_sensor.tare_heading();
@@ -129,14 +108,12 @@ void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
         heading1 = imu_sensor.get_heading();
         if (heading1 > 180) heading1 -= 360;
 
-
         averageHeading = (heading1);
         error = std::abs(degrees - averageHeading);
         errorRate = error - prevError;
        
         // using angular velocity instead of linear velocity
         velocity = turnKP * error + turnKD * errorRate;
-
 
         // if degrees is positive, turn right
         if (degrees > 0) {
@@ -147,143 +124,71 @@ void turnPID(double degrees, double scaling = 1.0) { //, double timeout = -1) {
             leftDrive = -velocity*scaling;
             rightDrive = velocity*scaling;
         }
-          
+         
         prevError = error;
-      
-        
+     
+       
         pros::delay(20);
     }
     leftDrive = 0;
     rightDrive = 0;
 }
 
-
 void autonomous()
 {
- 
- 
-
 /* leftDrive.move(-127);
- rightDrive.move(-127);
-
-    
- pros::delay(495); //might not be able to hard code cause unpredicable 
-
- leftDrive.move(0);
- rightDrive.move(0);
-
+ rightDrive.move(-127);  
+pros::delay(495); //might not be able to hard code cause unpredicable
+leftDrive.move(0);
+rightDrive.move(0);
 pros::delay(2000);
 drivePID(10);
 pros::delay(2000);
-turnPID(80, 1); 
+turnPID(80, 1);
 drivePID(8);
-
 catapultMotor.move(127);
 pros::delay(4000);
-
-
-
-
-
-
-
 drivePID(8);
-
 turnPID(90, 1);
-
 drivePID(5);
-
 turnPID(-25, 1);
-
 drivePID(37);
-
 turnPID(-10, 1);
-
-
 LW.set_value(true);
 RW.set_value(true);
-
 leftDrive.move(127);
 rightDrive.move(127);
-    
-pros::delay(1000); //might not be able to hard code cause unpredicable 
-
+pros::delay(1000); //might not be able to hard code cause unpredicable
 leftDrive.move(0);
 rightDrive.move(0);
-
 drivePID(-10);
-
-
 leftDrive.move(127);
 rightDrive.move(127);
-
 pros::delay(300);
-
 leftDrive.move(0);
 rightDrive.move(0);
-
 drivePID(-10);
-
 turnPID(-98, 1);
-
 LW.set_value(false);
 RW.set_value(false);
-
-
 drivePID(20);
-
 turnPID(40, 1);
-
 drivePID(5);
-
 turnPID(45, 1);
-
 LW.set_value(true);
 RW.set_value(true);
-
 leftDrive.move(127);
 rightDrive.move(127);
-
 pros::delay(300);
-
 leftDrive.move(0);
 rightDrive.move(0);
-
 drivePID(-10);
-
 leftDrive.move(127);
 rightDrive.move(127);
-
 pros::delay(300);
-
 leftDrive.move(0);
 rightDrive.move(0);
 */
-
-///////////////////////////////////////////////////Auton 2 | close side ///////////////////////////////////////////////////////////// 
-
-drivePID(27);
-turnPID(50, 1);
-LW.set_value(true);
-RW.set_value(true);
-drivePID(10);
-turnPID(40, 1);
-LW.set_value(false);
-RW.set_value(false);
-drivePID(-20);
-Intake.move(-127);
-pros::delay(500);
-Intake.move(0);
-drivePID(10);
-turnPID(-60,1); 
-drivePID(12);
-turnPID(-10, 1);
-drivePID(20); //Drive the corner triball and the one under net out on other side. May need to add another turnPID + adjust values 
-drivePID(-5);
-turnPID(-30, 1);
-
-
-
 //////////////////////////////////////////////////Auton 3 far side)
   /*drivePID(-8);
   Intake.move(-127);
@@ -320,23 +225,18 @@ turnPID(-30, 1);
 */
 }
 
-
 void opcontrol()
 {
     int drivePower;
     int turnPower;
 
-    while (true)
+ while (true)
     {
 
         drivePower = MasterController.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         turnPower = MasterController.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-        leftstate = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R2);
-        rightstate = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L2);
-        catacurrent = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L1);
-        catacontrol = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
-        // blockerState = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_UP);
-        // blockerState = MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP);
+        leftstate = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L2);
+        rightstate = MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R2);
         leftBottom.move(1 * (drivePower + turnPower));
         leftBack.move(1 * (drivePower + turnPower));
         leftTop.move(1 * (drivePower + turnPower));
@@ -344,14 +244,7 @@ void opcontrol()
         rightTop.move(drivePower - turnPower);
         rightBack.move(drivePower - turnPower);
 
-
-        // if (blockerState == true && blockerUpPressedPrev == false)
-        // {
-        //     blockerOpen = !blockerOpen;
-        //     blockerUp.set_value(blockerOpen);
-        // }
-        // blockerUpPressedPrev = blockerState;
-        
+       
         if (MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
             push = !push;
         }
@@ -364,7 +257,6 @@ void opcontrol()
             blockerUp.set_value(false);
         }
 
- 
         if (MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
             pull = !pull;
         }
@@ -378,18 +270,6 @@ void opcontrol()
             blockerDown.set_value(false);
         }
 
-        
-
-      
-      /*  if(downBlockerState == true && downBlockerUpPressedPrev == false && blockerState == false)
-        {
-            downBlockerOpen = !downBlockerOpen;
-            blockerUp.set_value(downBlockerOpen);
-            blockerDown.set_value(false); 
-            
-        }
-        downBlockerUpPressedPrev = downBlockerState; */
-       
         // wing L
         if (leftstate == true && leftprevious == false)
         {
@@ -397,11 +277,6 @@ void opcontrol()
              LW.set_value(wingsOpenLeft);
         }
         leftprevious = leftstate;
-
-    
-
-
-
 
         // wing R
         if (rightstate == true && rightprevious == false)
@@ -411,63 +286,70 @@ void opcontrol()
         }
         rightprevious = rightstate;
 
+ 
 
 
-
-        // Intake
-        if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
-        {
-            Intake.move(127);
-        }
-        else if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_B))
-        {
-            Intake.move(-127);
-        }
-        else
-        {
-            Intake.move(0);
-        }
-
-
-
-
-        // Catapult
-        if (spam) {
-            catapultMotor.move(127);
-        } else {
-        if (catacurrent == true && cataprevious == false)
-        {
-            cataOn = !cataOn;
-             
-        }
-        cataprevious = catacurrent;
-
-
-
-
-        if (abs(REST_POSITION - Rotationsensor.get_position()) > 500 || MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
-        {
-            catapultMotor.move(127);
-        }
-        else
-        {
-            catapultMotor.move(0);
-        }
-        }
-
-
-
-
-        if ( MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-        if (spam) catapultMotor.move(0);
-            spam = !spam;
-        }
-        pros::delay(10);
+  if (MasterController.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
+    {
+        intakeToggle = !intakeToggle;
     }
+
+
+   if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+{
+    intakeToggle = false;
+    Intake.move(-127); // Move forward when B is pressed
+}
+else if (intakeToggle)
+{
+    Intake.move(127); 
+}
+else
+{
+    intakeToggle = false; // Reset intakeToggle when neither Y nor B is pressed
+    Intake.move(0); // Stop when neither Y nor B is pressed
+}
+
+        if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+        {
+            cataState = !cataState;
+            pros::delay(200);
+       
+        // If L1 is toggled off, reset catapult position
+    if (!cataState) {
+        
+        Rotationsensor.reset_position();  // Reset the rotational sensor
+      
+        while (Rotationsensor.get_position() < 18000) {
+            pros::delay(10);
+            catapultMotor.move(127);
+        }
+        catapultMotor.move(0); 
+    }
+       
+        }
+
+
+      if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+    catapultMotor.move(100);
+}    else {
+    while (Rotationsensor.get_position() < 18000) { //Place right degree 
+        pros::delay(10);
+        catapultMotor.move(127);
+    }
+    catapultMotor.move(0); 
 }
 
 
+    if (cataState == true)
+    {
+        catapultMotor.move(100);
+    }
 
 
+    pros::delay(10);
+    }
+}
 
+/* 2.75 D,450 rpm*/
 
