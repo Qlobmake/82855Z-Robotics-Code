@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Far Side",
+    "project_name": "828UP",
     "target": "v5",
     "templates": {
       "kernel": {
