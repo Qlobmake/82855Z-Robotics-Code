@@ -70,7 +70,7 @@ double getPosition() {
   return 2.75 * M_PI * leftBottom.get_position() * (36.0 / 48.0);
 }
 
-void drivePID(double distance, int maxTimeMill) {
+void drivePID(double distance, double scaling, int maxTimeMill) {
   // reset motors
   leftDrive.tare_position();
   rightDrive.tare_position();
@@ -86,6 +86,9 @@ void drivePID(double distance, int maxTimeMill) {
     errorRate = error - prevError;
 
     velocity = KP * error + KD * errorRate;
+
+    // Multiply velocity by the scaling factor
+    velocity *= scaling;
 
     leftDrive = velocity;
     rightDrive = velocity;
@@ -151,89 +154,97 @@ void turnPID(double degrees, double scaling,
 
 void autonomous() {
 
- drivePID(-15, 600);
- drivePID(10, 5000);
-
- turnPID(80, 1, 5000);
- drivePID(5, 5000);
+ turnPID(-46, 1.5, 200);
+ drivePID(-22, 1, 1500);
+ turnPID(45, 1.5, 1500);
+ leftDrive.move(-127);
+ rightDrive.move(-127);
+ pros::delay(800);
+ leftDrive.move(0);
+ rightDrive.move(0);
+ drivePID(11, 1, 900);
+ turnPID(-55, 1.4, 900);
+ drivePID(12.5, 1, 20000);
+ turnPID(117.5, 1.2, 2000);
+ drivePID(5, 1.5, 900);
  catapultMotor.move(100);
  pros::delay(1000);
- catapultMotor.move(0);
- drivePID(-8, 5000);
- turnPID(90, 1, 5000);
- drivePID(-9, 5000);
- turnPID(-25, 1, 5000);
- drivePID(-37, 5000);
- turnPID(-10, 1, 5000);
+
+while(true){
+      if (
+        Rotationsensor.get_position() < 4000) { // desired angle on pros - 360.
+                                                // Angle messured in cetidegrees
+    
+       catapultMotor.move(127);
+    } else {
+       catapultMotor.move(0);
+       break;
+    }
+}
+  
+   
+   catapultMotor.move(0);
+  
+ 
+ drivePID(-8, 1,800);
+ turnPID(90, 1.4, 800);
+ drivePID(-10,1.5, 800);
+ turnPID(-68, 1.3, 1000);
+ drivePID(-70,1.3, 1000);
+ 
+ turnPID(-40, 1.2, 1100);
+ drivePID(-25, 0.9, 3000);
+ turnPID(20, 1.2, 1100);
+ //done
+ /*drivePID(10,1, 1100);
+ drivePID(-15,1, 1200);
+ drivePID(10,1, 1200 );
+ turnPID(-98, 1, 1000);
+
+ drivePID(20, 800);
+ turnPID(40, 1, 800);
+ drivePID(5, 800);
+ turnPID(45, 1, 1000);
  LW.set_value(true);
  RW.set_value(true);
- leftDrive.move(127);
- rightDrive.move(127);
- pros::delay(1000); //might not be able to hard code cause unpredicable
- leftDrive.move(0);
- rightDrive.move(0);
- drivePID(-10, 5000);
- leftDrive.move(127);
- rightDrive.move(127);
- pros::delay(300);
- leftDrive.move(0);
- rightDrive.move(0);
- drivePID(-10, 5000);
- turnPID(-98, 1, 5000);
- LW.set_value(false);
- RW.set_value(false);
- drivePID(20, 5000);
- turnPID(40, 1, 5000);
- drivePID(5, 5000);
- turnPID(45, 1, 5000);
- LW.set_value(true);
- RW.set_value(true);
- leftDrive.move(127);
- rightDrive.move(127);
- pros::delay(300);
- leftDrive.move(0);
- rightDrive.move(0);
- drivePID(-10, 5000);
- leftDrive.move(127);
- rightDrive.move(127);
- pros::delay(300);
- leftDrive.move(0);
- rightDrive.move(0); 
+ drivePID(20, 800);
+ drivePID(-10, 800); */
+ 
 
   //////////////////////////////////////////////////Auton 3 far side)
-  /*drivePID(-8);
+ /* drivePID(-8, 1, 1000);
   Intake.move(-127);
   pros::delay(150);
-  drivePID(22);
-  turnPID(-35, 1);
+  drivePID(22, 1, 100);
+  turnPID(-35, 1, 15000); 
   LW.set_value(true);
-  drivePID(24);
+  drivePID(24, 1, 1300);
   pros::delay(50);
   LW.set_value(false);
-  turnPID(-30, 1);
-  drivePID(5);
-  turnPID(20, 1);
-  drivePID(5);
-  drivePID(-5);
-  turnPID(150, 0.8);
-  drivePID(6);
+  turnPID(-30, 1, 1500);
+  drivePID(5, 0.8, 1700);
+  turnPID(20, 1, 1600);
+  drivePID(5, 0.8, 1500);
+  drivePID(-5, 0.8, 1200);
+  turnPID(150, 0.8, 1200);
+  drivePID(6, 0.8, 1200);
   Intake.move(-127);
   pros::delay(150);
-  drivePID(-5);
-  drivePID(-8);
-  turnPID(100, 1);
-  drivePID(37);
-  turnPID(90, 1);
+  drivePID(-5, 0.8, 1200);
+  drivePID(-8, 0.8, 1200);
+  turnPID(100, 1, 1200);
+  drivePID(37, 1.2, 1200);
+  turnPID(90, 1, 1200);
   LW.set_value(true);
   RW.set_value(true);
-  drivePID(11);
-  turnPID(90, 1);
-  drivePID(26);
-  drivePID(-27);
-  turnPID(-90, 1);
-  drivePID(-30);
-
+  drivePID(11, 0.8, 1200);
+  turnPID(90, 1, 1200);
+  drivePID(26, 1, 1200);
+  drivePID(-27, 1, 1200);
+  turnPID(-90, 1, 1200);
+  drivePID(-30, 1.2, 1200);
 */
+
 }
 
 void initialize() {
@@ -298,7 +309,7 @@ void opcontrol() {
     rightprevious = rightstate;
 
     if (MasterController.get_digital_new_press(
-            pros::E_CONTROLLER_DIGITAL_LEFT)) {
+            pros::E_CONTROLLER_DIGITAL_RIGHT)) {
       secHang = !secHang;
     }
 
@@ -351,7 +362,7 @@ else
     pros::lcd::print(2, "CATA ROTATION: %d", Rotationsensor.get_position());
 
     if (
-        Rotationsensor.get_position() < 4750) { // desired angle on pros - 360.
+        Rotationsensor.get_position() < 4000) { // desired angle on pros - 360.
                                                 // Angle messured in cetidegrees
        autoLower = true;
     } else {
