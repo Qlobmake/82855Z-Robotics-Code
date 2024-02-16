@@ -55,6 +55,8 @@ bool prevCataToggle = false;
 bool autoLower = false; // Assuming you have these variables
 bool cataMan = false;
 
+
+//Larger the scale factor the faster it moves or turn, larger number = lower scalling factor, smaller numbers = higher scalling factors
 // PID constants
 double KP = 7.5;
 double KD = 1.4;
@@ -109,47 +111,52 @@ void drivePID(double distance, double scaling, int maxTimeMill) {
   rightDrive = 0;
 }
 
-void turnPID(double degrees, double scaling,
-             int maxTimeMill) { //, double timeout = -1) {
-  imu_sensor.tare_heading();
-  error = degrees;
-  prevError = error;
-
-  double startTime = pros::millis();
-
-  double averageHeading, heading1;
-
-  while (std::abs(error) > 8 || leftBack.get_actual_velocity() > 15 ||
-         rightBack.get_actual_velocity() > 15 &&
-             (pros::millis() - startTime) < maxTimeMill) {
-    // distance subtracted by the average of the four ground motors
-    heading1 = imu_sensor.get_heading();
-    if (heading1 > 180)
-      heading1 -= 360;
-
-    averageHeading = (heading1);
-    error = std::abs(degrees - averageHeading);
-    errorRate = error - prevError;
-
-    // using angular velocity instead of linear velocity
-    velocity = turnKP * error + turnKD * errorRate;
-
-    // if degrees is positive, turn right
-    if (degrees > 0) {
-      leftDrive = velocity * scaling;
-      rightDrive = -velocity * scaling;
-      // if degrees is negative, turn right
-    } else {
-      leftDrive = -velocity * scaling;
-      rightDrive = velocity * scaling;
-    }
-
+void turnPID(double degrees, double scaling, int maxTimeMill) {
+    imu_sensor.tare_heading();
+    error = degrees;
     prevError = error;
 
-    pros::delay(20);
-  }
-  leftDrive = 0;
-  rightDrive = 0;
+    double startTime = pros::millis();
+
+    double averageHeading, heading1;
+
+    while (std::abs(error) > 8 || std::abs(leftBack.get_actual_velocity()) > 1 ||
+           std::abs(rightBack.get_actual_velocity()) > 1 &&
+               (pros::millis() - startTime) < maxTimeMill) {
+        // distance subtracted by the average of the four ground motors
+        heading1 = imu_sensor.get_heading();
+        if (heading1 > 180)
+            heading1 -= 360;
+
+        averageHeading = (heading1);
+        error = std::abs(degrees - averageHeading);
+        errorRate = error - prevError;
+
+        // using angular velocity instead of linear velocity
+        velocity = turnKP * error + turnKD * errorRate;
+
+        // if degrees is positive, turn right
+        if (degrees > 0) {
+            leftDrive = velocity * scaling;
+            rightDrive = -velocity * scaling;
+            // if degrees is negative, turn left
+        } else {
+            leftDrive = -velocity * scaling;
+            rightDrive = velocity * scaling;
+        }
+
+        prevError = error;
+
+        if ((pros::millis() - startTime) > maxTimeMill) {
+            // Timeout condition, exit the loop
+            break;
+        }
+
+        pros::delay(20);
+    }
+
+    leftDrive = 0;
+    rightDrive = 0;
 }
 
 void autonomous() {
@@ -194,9 +201,25 @@ while(true){
  
  turnPID(-40, 1.2, 1100);
  drivePID(-25, 0.9, 3000);
- turnPID(20, 1.2, 1100);
- //done
- /*drivePID(10,1, 1100);
+ turnPID(18, 1.2, 1100);
+ drivePID(-17, 0.9, 1000);
+ turnPID(-45, 1.3, 1100);
+  leftDrive.move(-127);
+ rightDrive.move(-127);
+ pros::delay(800);
+ leftDrive.move(0);
+ rightDrive.move(0);
+ drivePID(20, 0.9, 1000);
+  turnPID(-18, 1.5, 1100);
+leftDrive.move(-127);
+ rightDrive.move(-127);
+ pros::delay(800);
+ leftDrive.move(0);
+ rightDrive.move(0);
+ drivePID(15, 0.85, 1000);
+
+ /*
+ drivePID(10,1, 1100);
  drivePID(-15,1, 1200);
  drivePID(10,1, 1200 );
  turnPID(-98, 1, 1000);
@@ -369,45 +392,6 @@ else
       autoLower = false;
     }
 
-    /* if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-     {
-         cataState = !cataState;
-         pros::delay(200);
-
-     // If L1 is toggled off, reset catapult position
- if (!cataState) {
-
-     Rotationsensor.reset_position();  // Reset the rotational sensor
-
-     while (Rotationsensor.get_position() > -25000) {
-         pros::delay(10);
-         catapultMotor.move(127);
-     }
-     catapultMotor.move(0);
- }
-
-     }
-
-
-   if (MasterController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
- catapultMotor.move(100);
-} else {
-
-
- while (Rotationsensor.get_position() > -25000) { //Place right degree
-     pros::delay(10);
-     catapultMotor.move(127);
- }
- catapultMotor.move(0);
-}
-
-
- if (cataState == true)
- {
-     catapultMotor.move(100);
- }
-
-*/
     pros::delay(10);
   }
 }
