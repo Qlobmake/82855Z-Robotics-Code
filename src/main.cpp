@@ -160,10 +160,12 @@ void turnPID(double degrees, double scaling, int maxTimeMill) {
 }
 
 void autonomous() {
-
- turnPID(-46, 1.5, 200);
- drivePID(-22, 1, 1500);
- turnPID(45, 1.5, 1500);
+//inital turn
+ turnPID(-45, 1.5, 1000);
+ drivePID(-25, 1, 1500);
+ turnPID(47, 1.5, 1500);
+ 
+ //smash + cata
  leftDrive.move(-127);
  rightDrive.move(-127);
  pros::delay(800);
@@ -192,31 +194,33 @@ while(true){
    
    catapultMotor.move(0);
   
- 
+  //set the position after shooting. 
+ //before run down middle
  drivePID(-8, 1,800);
  turnPID(90, 1.4, 800);
- drivePID(-10,1.5, 800);
- turnPID(-68, 1.3, 1000);
- drivePID(-70,1.3, 1000);
+ drivePID(-9.25,1.5, 800);
+ turnPID(-71, 1.3, 1500);
  
- turnPID(-40, 1.2, 1100);
+ //run down the middle
+ drivePID(-42,1.3, 1500);
+ turnPID(-5, 1.8, 1000);
+ drivePID(-32,1.3, 1500);
+ 
+ //turn before smash
+ turnPID(-45, 1.2, 1100);
  drivePID(-25, 0.9, 3000);
- turnPID(18, 1.2, 1100);
- drivePID(-17, 0.9, 1000);
- turnPID(-45, 1.3, 1100);
-  leftDrive.move(-127);
+ turnPID(-47.5, 1.3, 1100);
+ 
+ //smash
+ leftDrive.move(-127);
  rightDrive.move(-127);
  pros::delay(800);
  leftDrive.move(0);
  rightDrive.move(0);
- drivePID(20, 0.9, 1000);
-  turnPID(-18, 1.5, 1100);
-leftDrive.move(-127);
- rightDrive.move(-127);
- pros::delay(800);
- leftDrive.move(0);
- rightDrive.move(0);
- drivePID(15, 0.85, 1000);
+ 
+ //back off
+ drivePID(10, 0.9, 1000);
+//turnPID(-18, 1.5, 1100);
 
  /*
  drivePID(10,1, 1100);
